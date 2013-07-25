@@ -18,7 +18,7 @@
     return this
   }
 
-  _.extend(State.prototype, Backbone.Events, {
+  _.extend(StateModel.prototype, Backbone.Events, {
 
     toJSON: function() {
       return _.clone(this.states)
