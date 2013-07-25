@@ -6,7 +6,7 @@
   if (typeof define === 'function' && define.amd) {
     define(['underscore', 'backbone'], factory)
   } else {
-    root.State = factory(root._, root.Backbone)
+    root.StateModel = factory(root._, root.Backbone)
   }
 }(this, function (_, Backbone) { 'use strict'
 
@@ -145,7 +145,7 @@
 
   })
 
-  return State
+  return StateModel
 
 }));
 
