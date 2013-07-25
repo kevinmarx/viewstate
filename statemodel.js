@@ -1,4 +1,4 @@
-// State model for Backbone
+// StateModel for Backbone
 // Kevin Marx, Sportngin
 // license: MIT
 
@@ -10,11 +10,12 @@
   }
 }(this, function (_, Backbone) { 'use strict'
 
-  var State = function(attributes) {
+  var StateModel = function(attributes) {
     var attrs = attributes || {}
     this.states = {}
-    this._initStates = deepClone(null, attrs)
-    this.set(attributes)
+    this.set(attrs)
+    this._initStates = deepClone(this.states)
+    return this
   }
 
   _.extend(State.prototype, Backbone.Events, {
@@ -35,61 +36,111 @@
       return this.states[item][states]
     },
 
-    set: function(item, states, options) {
-      if (typeof states === 'object' && !options && arguments.length === 2) {
-        options = states
-        states = undefined
-      }
-      var silent = options.silent
+    set: function(item, states, bool, options) {
+      var attr, attrs, silent, current, changing, prev, changes, unset, state, s, obj
 
-      if (Array.isArray(states)) {
-        _.each(states, function(state) {
-          this.states[item][state] = true
-          if (!silent) this.trigger(item + ':' + state, true)
-        }, this)
-        return this
-      } else {
-        states ? this.states[item][states] = true : this.states[item] = true
-        if (!silent) this.trigger(item + ':' + states, true)
-        return this
+      if (typeof bool === 'object') {
+        options = bool
+        bool = undefined
       }
+
+      if (bool !== false) bool = true
+      options = options || {}
+
+      if (typeof item === 'object') {
+        attrs = item
+      } else {
+        obj = objectify(states, bool)
+        attrs = obj
+        if (typeof attrs !== 'object' || !this.states[item])
+          (attrs = {})[item] = obj
+      }
+
+      silent         = options.silent
+      unset          = options.unset
+      changes        = []
+      changing       = this._changing
+      this._changing = true
+
+      if (!changing) {
+        this._previousStates = _.clone(this.states)
+        this.changed = {}
+      }
+
+      current = this.states[item]
+      if (!current || unset) current = this.states
+
+      prev = this._previousStates
+
+      for (attr in attrs) {
+        state = attrs[attr]
+        if (typeof state === 'object') {
+          if (!current[attr]) current[attr] = {}
+          this.set(attr, state)
+        } else {
+          if (_.isEqual(current[attr], state)) changes.push(attr)
+          if (_.isEqual(prev[attr]), state) {
+            this.changed[attr] = state
+          } else {
+            delete this.changed[attr]
+          }
+          unset ? delete current[attr] : current[attr] = state
+        }
+      }
+
+      if (!silent) {
+        if (changes.length) this._pending = true
+        for (var i = 0; i < changes.length; i++) {
+          this.trigger(changes[i], bool)
+        }
+      }
+
+      if (changing) return this
+      if (!silent) {
+        while (this._pending) {
+          this._pending = false
+          this.trigger('change', this)
+        }
+      }
+      this._pending = false
+      this._changing = false
+      return this
     },
 
     unset: function(item, states, options) {
-      if (typeof states === 'object' && !options && arguments.length === 2) {
+      if (typeof states === 'object') {
         options = states
-        states = undefined
-      }
-      var silent = options.silent
-
-      if (Array.isArray(states)) {
-        _.each(states, function(state) {
-          this.states[item][state] = false
-          if (!silent) this.trigger(item + ':' + state, false)
-        }, this)
-        return this
+        return this.set(item, void 0, _.extend({}, options, {unset: true}))
       } else {
-        states ? this.states[item][states] = false : this.states[item] = false
-        if (!silent) this.trigger(item + ':' + states, false)
-        return this
+        return this.set(item, states, _.extend({}, options, {unset: true}))
       }
     },
 
     reset: function(item, options) {
       options = options || {}
       if (!item) {
-        if (options.empty)
-          this.states = {}
-        else
-          this.states = this._initStates
+        if (!_.isEmpty(this.states)) {
+          for (var key in this.states) {
+            this.unset(key, {silent: true})
+            if (this._initStates[key]) this.set(key, this._initStates[key], {silent: true})
+          }
+        } else {
+          for (var key in this._initStates) {
+            this.set(this._initStates, null, {silent: true})
+          }
+        }
       } else {
-        if (options.empty)
-          this.states[item] = {}
-        else
-          this.states[item] = this._initStates[item]
+        this.unset(this.states[item], {silent: true})
+        this.set(item, this._initStates[item], {silent: true})
       }
       if (!options.silent) this.trigger('reset:' + item)
       return this
+    },
+
+    clear: function(options) {
+      var attrs = {}
+      for (var key in this.states) attrs[key] = void 0
+      return this.set(attrs, null, _.extend({}, options, {unset: true}))
     }
 
   })
@@ -98,13 +149,25 @@
 
 }));
 
-function deepClone(dest, source) {
-  dest = dest || {}
+function deepClone(source) {
+  var dest = {}
   for (var prop in source) {
     if (typeof source[prop] === 'object' && source[prop] !== null)
-      clone(dest[prop], source[prop])
+      dest[prop] = deepClone(source[prop])
     else
       dest[prop] = source[prop]
   }
   return dest
 }
+
+function objectify(arr, bool) {
+  if (!arr) return bool
+  if (!Array.isArray(arr) && typeof arr === 'object') return arr
+  var obj = {}
+  if (typeof arr === 'string') return obj[arr] = bool
+  _.each(arr, function(item) {
+    obj[item] = bool
+  })
+  return obj
+}
+
