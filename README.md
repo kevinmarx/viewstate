@@ -1,4 +1,4 @@
-statemodel
+View State
 ==========
 
-A State Model for Backbone
+State tracking for Backbone Views
