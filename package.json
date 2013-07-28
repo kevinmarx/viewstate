@@ -18,15 +18,19 @@
   },
   "main": "./lib/viewstate.js",
   "dependencies" : {
-    "underscore" : "1.x.x",
-    "backbone"   : "1.x.x"
+    "underscore" : "1.5.1",
+    "backbone"   : "1.0.0"
   },
   "devDependencies": {
     "mocha": "*",
-    "sinon" : "1.6.x",
-    "grunt": "0.4.x",
-    "grunt-contrib-uglify": "0.1.x",
-    "grunt-contrib-jshint": "~0.2.0",
-    "grunt-simple-mocha": "~0.3.2"
+    "sinon": "*",
+    "blanket": "*"
+  },
+  "scripts": {
+    "test": "mocha --recursive -R spec",
+    "coverage": "mocha --recursive --require blanket -R html-cov > coverage.html && open ./coverage.html",
+    "blanket": {
+      "pattern": "//^(?!.*node_modules.*$).*lib\//"
+    }
   }
 }
