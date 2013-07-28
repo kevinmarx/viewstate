@@ -66,6 +66,11 @@ describe('add', function() {
     assert(State.get('addedState'))
   })
 
+  it('adds to existing nested states', function() {
+    State.add('nestedState', 'added')
+    assert(_.keys(State.get('nestedState')).length === 4)
+  })
+
   it('adds nested states', function() {
     State.add('addedState', ['loading', 'spinning'])
     var s = State.get('addedState')
@@ -108,7 +113,7 @@ describe('remove', function() {
 
   it('removes nested states on an item with an array', function() {
     State.remove('nestedState', ['spinning', 'loading'])
-    assert(!State.get('nestedState', ['spinning', 'loading']))
+    assert(_.isEmpty(State.get('nestedState', ['spinning', 'loading'])))
   })
 
 })
@@ -130,13 +135,6 @@ describe('reset', function() {
     State.reset('singularState')
     assert(State.get('singularState'))
     assert(!State.get('nestedState'))
-  })
-
-  it('resets a singular nested state on an item', function() {
-    State.remove('nestedState')
-    State.reset('nestedState', 'spinning')
-    assert(State.get('nestedState', 'spinning'))
-    assert(!State.get('nestedState', ['loading', 'disabled']))
   })
 
 })
