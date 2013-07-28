@@ -1,0 +1,31 @@
+{
+  "name": "ViewState",
+  "description": "State tracking for Backbone Views",
+  "version": "0.0.1",
+  "keywords": [
+    "state",
+    "states",
+    "state tracking",
+    "view state",
+    "state model",
+    "not a fsm"
+  ],
+  "homepage": "http://github.com/kevinmarx/viewstate",
+  "author": "Kevin Marx <kevindmarx@gmail.com.com> (http://github.com/kevinmarx)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kevinmarx/viewstate.git"
+  },
+  "main": "./lib/viewstate.js",
+  "dependencies" : {
+    "underscore" : "1.x.x",
+    "backbone"   : "1.x.x"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "grunt": "0.4.x",
+    "grunt-contrib-uglify": "0.1.x",
+    "grunt-contrib-jshint": "~0.2.0",
+    "grunt-simple-mocha": "~0.3.2"
+  }
+}
