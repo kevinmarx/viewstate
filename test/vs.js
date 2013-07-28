@@ -94,6 +94,10 @@ describe('add', function() {
     assert(typeof s === 'boolean')
   })
 
+  it('returns itself on add', function() {
+    assert(State.add('addedState') instanceof ViewState)
+  })
+
 })
 
 describe('remove', function() {
@@ -139,6 +143,10 @@ describe('reset', function() {
     assert(!State.get('nestedState'))
   })
 
+  it('returns itself on reset', function() {
+    assert(State.reset() instanceof ViewState)
+  })
+
 })
 
 describe('clear', function() {
@@ -146,6 +154,10 @@ describe('clear', function() {
   it('clears all states that are set', function() {
     State.clear()
     assert(_.isEmpty(State.states))
+  })
+
+  it('returns itself on clear', function() {
+    assert(State.clear() instanceof ViewState)
   })
 
 })
@@ -177,11 +189,37 @@ describe('events', function() {
     assert(spy.calledOnce)
   })
 
+  it('passes itself as an argument on change', function() {
+    var spy = sinon.spy()
+    var obj
+    State.on('change', function(state) { spy(); obj = state}, this)
+    State.add('addedState')
+    assert(spy.calledOnce)
+    assert(obj)
+    assert(obj instanceof ViewState)
+  })
+
   it('triggers multiple change events', function() {
     var spy = sinon.spy()
     State.on('change:addedState', spy, this)
     State.add('addedState', ['spinning', 'loading', 'updating'])
     assert.equal(spy.callCount, 3)
+  })
+
+  it('passes itself and the state as arguments for a single state', function() {
+    var args
+    State.on('change:addedState', function() { args = arguments }, this)
+    State.add('addedState')
+    assert(args['0'] && args['0'] instanceof ViewState)
+    assert(args['1'] && typeof args['1'] === 'boolean')
+  })
+
+  it('passes itself and the states as arguments for nested states', function() {
+    var args
+    State.on('change:addedState', function() { args = arguments }, this)
+    State.add('addedState', ['spinning', 'loading'])
+    assert(args['0'] && args['0'] instanceof ViewState)
+    assert(args['1'] && typeof args['1'] === 'object')
   })
 
   it('scopes nested changes', function() {
@@ -191,6 +229,40 @@ describe('events', function() {
     assert(spy.calledOnce)
   })
 
+  it('triggers reset', function() {
+    var spy = sinon.spy()
+    State.on('reset', spy, this)
+    State.reset()
+    assert(spy.calledOnce)
+  })
+
+  it('triggers scoped reset event when item is passed', function() {
+    var spy = sinon.spy()
+    State.on('reset:singularState', spy, this)
+    State.reset('singularState')
+    assert(spy.calledOnce)
+  })
+
+  it('passes itself as an argument on reset', function() {
+    var args
+    State.on('reset', function() { args = arguments }, this)
+    State.reset()
+    assert(args['0'] instanceof ViewState)
+  })
+
+  it('triggers clear', function() {
+    var spy = sinon.spy()
+    State.on('clear', spy, this)
+    State.clear()
+    assert(spy.calledOnce)
+  })
+
+  it('passes itself as an argument on clear', function() {
+    var args
+    State.on('clear', function() { args = arguments }, this)
+    State.clear()
+    assert(args['0'] instanceof ViewState)
+  })
 
 })
 
