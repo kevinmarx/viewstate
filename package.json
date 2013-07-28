@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "mocha": "*",
+    "sinon" : "1.6.x",
     "grunt": "0.4.x",
     "grunt-contrib-uglify": "0.1.x",
     "grunt-contrib-jshint": "~0.2.0",

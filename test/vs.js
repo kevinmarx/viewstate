@@ -1,6 +1,8 @@
 var assert = require('assert')
 var ViewState = require('../lib/viewstate')
 var _ = require('underscore')
+var sinon = require('sinon')
+
 var State
 var testItem = {
   'nestedState': {
@@ -156,6 +158,39 @@ describe('toJSON', function() {
     assert(typeof s === 'object')
     assert(JSON.stringify(s))
   })
+
+})
+
+describe('events', function() {
+
+  it('triggers change on add', function() {
+    var spy = sinon.spy()
+    State.on('change', spy, this)
+    State.add('addedState')
+    assert(spy.calledOnce)
+  })
+
+  it('triggers change on remove', function() {
+    var spy = sinon.spy()
+    State.on('change', spy, this)
+    State.remove('singularState')
+    assert(spy.calledOnce)
+  })
+
+  it('triggers multiple change events', function() {
+    var spy = sinon.spy()
+    State.on('change:addedState', spy, this)
+    State.add('addedState', ['spinning', 'loading', 'updating'])
+    assert.equal(spy.callCount, 3)
+  })
+
+  it('scopes nested changes', function() {
+    var spy = sinon.spy()
+    State.on('change:addedState:spinning', spy, this)
+    State.add('addedState', ['spinning', 'loading'])
+    assert(spy.calledOnce)
+  })
+
 
 })
 
