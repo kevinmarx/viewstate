@@ -134,4 +134,16 @@ ViewState.toJSON()
 As like Backbone you can pass `{silent: true}` into `add`, `remove`, `reset`, and `clear` to supress the event for that method
 from being triggered.
 
+## Events
+Events are scoped to the level of the attribute that is changing. This allows you to listen to events on StateView with varying levels
+of specificity.
+
+`add` and `remove` will always trigger a `change` event passing the viewstate as an argument.
+
+Changing a single state to ViewState will trigger `('change:stateName', ViewState, value)` where `value` is the value of the changed state either `true` or `undefined`.
+
+Changing multiple states to ViewState will trigger `('change:itemName:stateName', ViewState, value)` where `value` is a hash of the changed attributes, `{loading: true, spinning: true}`, or `undefined` if
+the states were removed.
+
+The `reset` and `clear` events both only pass the `ViewState` as an argument on the event.
 
