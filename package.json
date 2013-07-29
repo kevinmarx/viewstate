@@ -16,7 +16,7 @@
     "type": "git",
     "url": "https://github.com/kevinmarx/viewstate.git"
   },
-  "main": "./lib/viewstate.js",
+  "main": "index.js",
   "dependencies" : {
     "underscore" : "1.5.1",
     "backbone"   : "1.0.0"
