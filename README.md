@@ -134,7 +134,7 @@ ViewState.toJSON()
 As like Backbone you can pass `{silent: true}` into `add`, `remove`, `reset`, and `clear` to supress the event for that method
 from being triggered.
 
-### Events
+## Events
 Events are scoped to the level of the attribute that is changing. This allows you to listen to events on StateView with varying levels
 of specificity.
 
