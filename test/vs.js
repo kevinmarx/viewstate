@@ -264,6 +264,20 @@ describe('events', function() {
     assert(args['0'] instanceof ViewState)
   })
 
+  it("doesn't trigger on add with silent", function() {
+    var spy = sinon.spy()
+    State.on('change', spy, this)
+    State.add('addedState', null, {silent: true})
+    assert(!spy.called)
+  })
+
+  it("doesn't trigger on remove with silent", function() {
+    var spy = sinon.spy()
+    State.on('change', spy, this)
+    State.remove('singularState', {silent: true})
+    assert(!spy.called)
+  })
+
 })
 
 
