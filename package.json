@@ -1,5 +1,5 @@
 {
-  "name": "ViewState",
+  "name": "viewstate",
   "description": "State tracking for Backbone Views",
   "version": "0.0.1",
   "keywords": [
